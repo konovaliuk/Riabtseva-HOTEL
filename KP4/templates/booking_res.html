@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Rooms</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+    <script>
+        function validateForm() {
+            var checkinDate = document.getElementById("checkin-date").value;
+            var checkoutDate = document.getElementById("checkout-date").value;
+            var checkboxes = document.getElementsByName("room");
+            var isChecked = false;
+
+            if (checkinDate === "" || checkoutDate === "") {
+                alert("Please select both check-in and check-out dates before choosing a room.");
+                return false;
+            }
+
+            for (var i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i].checked) {
+                    isChecked = true;
+                    break;
+                }
+            }
+
+            if (!isChecked) {
+                alert("Please select a room before submitting.");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</head>
+<body>
+    {% if available_rooms %}
+    <h2>Available Rooms:</h2>
+    <form action="/room/add" method="POST" onsubmit="return validateForm()">
+        <div>
+            <label for="checkin-date">Check-in Date</label>
+            <input type="date" id="checkin-date" name="checkin-date" class="form-control form-control-lg">
+        </div>
+        <br>
+        <div>
+            <label for="checkout-date">Check-out Date</label>
+            <input type="date" id="checkout-date" name="checkout-date" class="form-control form-control-lg">
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>№</th>
+                    <th>Room Type</th>
+                    <th>Number of People</th>
+                    <th>Price</th>
+                    <th>Select</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for available_room in available_rooms %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ available_room.room_type }}</td>
+                    <td>{{ available_room.max_capacity }}</td>
+                    <td>{{ available_room.room_price }}</td>
+                    <td>
+                        <input type="checkbox" name="room" value="{{ available_room }}">
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <br>
+        <input type="submit" value="Choose">
+    </form>
+    {% else %}
+    <p>No available rooms found.</p>
+    {% endif %}
+</body>
+</html>
